@@ -12,10 +12,25 @@ const corsMiddleware = cors();
 app.use(corsMiddleware);
 app.use(parserMiddleware);
 app.use(Movie);
-app.get("/message", (req, res) => res.send("Hola amigo!!!"));
+
+let views = 1;
 app.post("/message", (req, res, next) => {
   console.log("Text posted: ", req.body);
-  res.send(req.body);
+  console.log(views);
+  try {
+    if (req.body.message === "" || req.body.text === "") {
+      res.status(400).send("Bad Request");
+    } else if (views > 5) {
+      res
+        .status(429)
+        .send("Slow down mi viejo amigo, Too much requests! Try it later");
+    } else {
+      res.send(req.body);
+    }
+    views++;
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.listen(port, () => console.log(`Listening port on ${port}`));
